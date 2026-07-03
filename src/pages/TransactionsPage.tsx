@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { fetchTransactions, type Transaction } from '../api/transactions';
 import { fetchAccounts } from '../api/accounts';
@@ -34,6 +34,7 @@ function formatMonthLabel(key: string): string {
 
 export default function TransactionsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const type = searchParams.get('type') || '';
   const accountId = searchParams.get('account_id') || '';
@@ -97,9 +98,12 @@ export default function TransactionsPage() {
     return groupByMonth(txData.transactions);
   }, [txData]);
 
-  const handleRowClick = useCallback((_transaction: Transaction) => {
-    // TODO: Navigate to edit view when available
-  }, []);
+  const handleRowClick = useCallback(
+    (transaction: Transaction) => {
+      navigate(`/transactions/${transaction.id}`);
+    },
+    [navigate]
+  );
 
   const handlePageChange = useCallback(
     (newOffset: number) => {
