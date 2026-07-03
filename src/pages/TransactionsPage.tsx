@@ -1,13 +1,17 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { fetchTransactions, type Transaction } from '../api/transactions';
 import { fetchAccounts } from '../api/accounts';
+import { fetchRelations, type Relation } from '../api/relations';
 import TransactionFiltersBar from '../components/TransactionFiltersBar';
 import TransactionRow from '../components/TransactionRow';
 import TransactionRowSkeleton from '../components/TransactionRowSkeleton';
 import MonthGroupHeader from '../components/MonthGroupHeader';
 import Pagination from '../components/Pagination';
+import LinkTransferPairModal from '../components/LinkTransferPairModal';
+import GroupTransactionsModal from '../components/GroupTransactionsModal';
+import RelationDetailModal from '../components/RelationDetailModal';
 
 const LIMIT = 20;
 
@@ -32,9 +36,14 @@ function formatMonthLabel(key: string): string {
   return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 }
 
+function getRelationsForTransaction(txId: string, relations: Relation[]): Relation[] {
+  return relations.filter((r) => r.members.some((m) => m.transaction_id === txId));
+}
+
 export default function TransactionsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const type = searchParams.get('type') || '';
   const accountId = searchParams.get('account_id') || '';
@@ -42,6 +51,11 @@ export default function TransactionsPage() {
   const dateFrom = searchParams.get('date_from') || '';
   const dateTo = searchParams.get('date_to') || '';
   const offset = Number(searchParams.get('offset') || '0');
+
+  // Modal state
+  const [linkPairTarget, setLinkPairTarget] = useState<Transaction | null>(null);
+  const [groupTarget, setGroupTarget] = useState<Transaction | null>(null);
+  const [relationDetailTarget, setRelationDetailTarget] = useState<Transaction | null>(null);
 
   const updateParam = useCallback(
     (key: string, value: string) => {
@@ -93,6 +107,14 @@ export default function TransactionsPage() {
     placeholderData: keepPreviousData,
   });
 
+  const { data: relationsData } = useQuery({
+    queryKey: ['relations'],
+    queryFn: () => fetchRelations(),
+    staleTime: 30_000,
+  });
+
+  const relations = relationsData ?? [];
+
   const grouped = useMemo(() => {
     if (!txData?.transactions) return new Map<string, Transaction[]>();
     return groupByMonth(txData.transactions);
@@ -111,6 +133,16 @@ export default function TransactionsPage() {
     },
     [updateParam]
   );
+
+  const handleLinkSuccess = useCallback(() => {
+    setLinkPairTarget(null);
+    queryClient.invalidateQueries({ queryKey: ['relations'] });
+  }, [queryClient]);
+
+  const handleGroupSuccess = useCallback(() => {
+    setGroupTarget(null);
+    queryClient.invalidateQueries({ queryKey: ['relations'] });
+  }, [queryClient]);
 
   return (
     <div
@@ -134,6 +166,21 @@ export default function TransactionsPage() {
           {isFetching && !isLoading && (
             <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Updating…</span>
           )}
+          <button
+            onClick={() => setGroupTarget({} as Transaction)}
+            style={{
+              padding: '0.5rem 1rem',
+              borderRadius: '6px',
+              border: '1px solid #d1d5db',
+              backgroundColor: '#fff',
+              fontSize: '0.875rem',
+              fontWeight: 500,
+              cursor: 'pointer',
+              color: '#374151',
+            }}
+          >
+            📎 Group
+          </button>
           <button
             onClick={() => navigate('/transactions/new')}
             style={{
@@ -200,7 +247,15 @@ export default function TransactionsPage() {
               <div key={monthKey}>
                 <MonthGroupHeader label={formatMonthLabel(monthKey)} />
                 {transactions.map((tx) => (
-                  <TransactionRow key={tx.id} transaction={tx} onClick={handleRowClick} />
+                  <TransactionRow
+                    key={tx.id}
+                    transaction={tx}
+                    onClick={handleRowClick}
+                    relations={getRelationsForTransaction(tx.id, relations)}
+                    onViewRelations={setRelationDetailTarget}
+                    onLinkPair={setLinkPairTarget}
+                    onGroupWith={setGroupTarget}
+                  />
                 ))}
               </div>
             ))}
@@ -216,6 +271,30 @@ export default function TransactionsPage() {
           />
         )}
       </div>
+
+      {/* Modals */}
+      {linkPairTarget && (
+        <LinkTransferPairModal
+          sourceTransaction={linkPairTarget}
+          onClose={() => setLinkPairTarget(null)}
+          onSuccess={handleLinkSuccess}
+        />
+      )}
+
+      {groupTarget && (
+        <GroupTransactionsModal
+          initialTransactions={groupTarget.id ? [groupTarget] : []}
+          onClose={() => setGroupTarget(null)}
+          onSuccess={handleGroupSuccess}
+        />
+      )}
+
+      {relationDetailTarget && (
+        <RelationDetailModal
+          transaction={relationDetailTarget}
+          onClose={() => setRelationDetailTarget(null)}
+        />
+      )}
     </div>
   );
 }

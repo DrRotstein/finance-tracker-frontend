@@ -1,8 +1,15 @@
 import type { Transaction } from '../api/transactions';
+import type { Relation } from '../api/relations';
+import RelationBadge from './RelationBadge';
+import TransactionActionMenu from './TransactionActionMenu';
 
 interface TransactionRowProps {
   transaction: Transaction;
   onClick: (transaction: Transaction) => void;
+  relations?: Relation[];
+  onViewRelations?: (transaction: Transaction) => void;
+  onLinkPair?: (transaction: Transaction) => void;
+  onGroupWith?: (transaction: Transaction) => void;
 }
 
 function getTypeColor(type: Transaction['type']): string {
@@ -56,7 +63,14 @@ function getAccountDisplay(transaction: Transaction): string {
   return to;
 }
 
-export default function TransactionRow({ transaction, onClick }: TransactionRowProps) {
+export default function TransactionRow({
+  transaction,
+  onClick,
+  relations = [],
+  onViewRelations,
+  onLinkPair,
+  onGroupWith,
+}: TransactionRowProps) {
   const typeColor = getTypeColor(transaction.type);
 
   return (
@@ -72,7 +86,7 @@ export default function TransactionRow({ transaction, onClick }: TransactionRowP
       }}
       style={{
         display: 'grid',
-        gridTemplateColumns: '70px 32px 1fr 1fr auto',
+        gridTemplateColumns: '70px 32px 1fr 1fr auto auto auto',
         alignItems: 'center',
         gap: '0.75rem',
         padding: '0.75rem 1rem',
@@ -149,6 +163,25 @@ export default function TransactionRow({ transaction, onClick }: TransactionRowP
         }}
       >
         {formatAmount(transaction.amount, transaction.type)}
+      </span>
+
+      <span>
+        {relations.length > 0 && onViewRelations && (
+          <RelationBadge
+            relations={relations}
+            onClick={() => onViewRelations(transaction)}
+          />
+        )}
+      </span>
+
+      <span>
+        {(onLinkPair || onGroupWith) && (
+          <TransactionActionMenu
+            transaction={transaction}
+            onLinkPair={onLinkPair ?? (() => {})}
+            onGroupWith={onGroupWith ?? (() => {})}
+          />
+        )}
       </span>
     </div>
   );
