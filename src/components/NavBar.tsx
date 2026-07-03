@@ -45,6 +45,13 @@ export default function NavBar() {
       }}
     >
       <NavLink
+        to="/"
+        end
+        style={({ isActive }) => (isActive ? activeLinkStyle : linkStyle)}
+      >
+        📊 Dashboard
+      </NavLink>
+      <NavLink
         to="/accounts"
         style={({ isActive }) => (isActive ? activeLinkStyle : linkStyle)}
       >
@@ -57,7 +64,7 @@ export default function NavBar() {
         📋 Transactions
       </NavLink>
       <NavLink
-        to="/outstanding"
+        to="/transfers/outstanding"
         style={({ isActive }) => (isActive ? activeLinkStyle : linkStyle)}
       >
         🔗 Outstanding

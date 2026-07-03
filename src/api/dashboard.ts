@@ -1,8 +1,12 @@
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
 export interface AccountBalance {
   id: string;
   name: string;
   type: string;
   current_balance: number;
+  currency?: string;
+  is_external?: boolean;
 }
 
 export interface MonthlySummary {
@@ -11,8 +15,6 @@ export interface MonthlySummary {
   total_expenses: number;
   total_transfers: number;
 }
-
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 export async function fetchAccountBalances(): Promise<AccountBalance[]> {
   const response = await fetch(`${API_BASE}/accounts/balances`);
