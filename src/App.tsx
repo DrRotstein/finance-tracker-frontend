@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AccountsPage from './pages/AccountsPage';
 import TransactionsPage from './pages/TransactionsPage';
 import TransactionFormPage from './pages/TransactionFormPage';
+import OutstandingTransfersPage from './pages/OutstandingTransfersPage';
 import NavBar from './components/NavBar';
 
 const queryClient = new QueryClient({
@@ -24,6 +25,7 @@ function App() {
           <Route path="/transactions" element={<TransactionsPage />} />
           <Route path="/transactions/new" element={<TransactionFormPage />} />
           <Route path="/transactions/:id" element={<TransactionFormPage />} />
+          <Route path="/transfers/outstanding" element={<OutstandingTransfersPage />} />
           <Route path="*" element={<Navigate to="/accounts" replace />} />
         </Routes>
       </BrowserRouter>
