@@ -26,6 +26,26 @@ export interface TransactionFilters {
   limit?: number;
 }
 
+export interface CreateTransactionPayload {
+  type: 'expense' | 'income' | 'transfer';
+  amount: number;
+  from_account_id?: string | null;
+  to_account_id?: string | null;
+  date: string;
+  category: string;
+  description?: string;
+}
+
+export interface UpdateTransactionPayload {
+  type?: 'expense' | 'income' | 'transfer';
+  amount?: number;
+  from_account_id?: string | null;
+  to_account_id?: string | null;
+  date?: string;
+  category?: string;
+  description?: string;
+}
+
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 export async function fetchTransactions(
@@ -44,6 +64,43 @@ export async function fetchTransactions(
   const response = await fetch(`${API_BASE}/transactions?${params.toString()}`);
   if (!response.ok) {
     throw new Error(`Failed to fetch transactions: ${response.status}`);
+  }
+  return response.json();
+}
+
+export async function fetchTransaction(id: string): Promise<Transaction> {
+  const response = await fetch(`${API_BASE}/transactions/${id}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch transaction: ${response.status}`);
+  }
+  return response.json();
+}
+
+export async function createTransaction(payload: CreateTransactionPayload): Promise<Transaction> {
+  const response = await fetch(`${API_BASE}/transactions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw new Error(body.message || `Failed to create transaction: ${response.status}`);
+  }
+  return response.json();
+}
+
+export async function updateTransaction(
+  id: string,
+  payload: UpdateTransactionPayload
+): Promise<Transaction> {
+  const response = await fetch(`${API_BASE}/transactions/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw new Error(body.message || `Failed to update transaction: ${response.status}`);
   }
   return response.json();
 }

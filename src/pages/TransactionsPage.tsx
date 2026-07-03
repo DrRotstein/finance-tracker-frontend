@@ -130,9 +130,26 @@ export default function TransactionsPage() {
         }}
       >
         <h1 style={{ margin: 0, fontSize: '1.5rem' }}>📋 Transactions</h1>
-        {isFetching && !isLoading && (
-          <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Updating…</span>
-        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          {isFetching && !isLoading && (
+            <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Updating…</span>
+          )}
+          <button
+            onClick={() => navigate('/transactions/new')}
+            style={{
+              padding: '0.5rem 1rem',
+              borderRadius: '6px',
+              border: 'none',
+              backgroundColor: '#1976d2',
+              color: '#fff',
+              fontSize: '0.875rem',
+              fontWeight: 500,
+              cursor: 'pointer',
+            }}
+          >
+            + New Transaction
+          </button>
+        </div>
       </div>
 
       <div
