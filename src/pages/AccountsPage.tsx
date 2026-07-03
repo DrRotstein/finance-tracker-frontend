@@ -159,7 +159,7 @@ export default function AccountsPage() {
           <p style={{ margin: 0, fontWeight: 600, textAlign: 'right' }}>
             Total Net Balance:{' '}
             <span style={{ fontSize: '1.125rem' }}>
-              {accounts.reduce((sum, a) => sum + a.balance, 0).toFixed(2)}
+              {accounts.reduce((sum, a) => sum + a.currentBalance, 0).toFixed(2)}
             </span>
           </p>
         </div>

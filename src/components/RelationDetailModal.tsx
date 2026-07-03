@@ -197,10 +197,10 @@ export default function RelationDetailModal({ transaction, onClose }: RelationDe
                 <div style={{ padding: '0.5rem 0' }}>
                   {relation.members.map((member) => {
                     const memberTx = member.transaction;
-                    const isCurrentTx = member.transaction_id === transaction.id;
+                    const isCurrentTx = member.transactionId === transaction.id;
                     return (
                       <div
-                        key={member.transaction_id}
+                        key={member.transactionId}
                         style={{
                           padding: '0.5rem 1rem',
                           display: 'flex',
@@ -222,7 +222,7 @@ export default function RelationDetailModal({ transaction, onClose }: RelationDe
                             </>
                           ) : (
                             <span style={{ color: '#94a3b8' }}>
-                              Transaction {member.transaction_id.slice(0, 8)}…
+                              Transaction {member.transactionId.slice(0, 8)}…
                             </span>
                           )}
                           {isCurrentTx && (

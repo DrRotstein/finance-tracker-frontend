@@ -72,8 +72,8 @@ export default function LinkTransferPairModal({
       (search === '' ||
         tx.description?.toLowerCase().includes(search.toLowerCase()) ||
         tx.category.toLowerCase().includes(search.toLowerCase()) ||
-        tx.from_account?.name?.toLowerCase().includes(search.toLowerCase()) ||
-        tx.to_account?.name?.toLowerCase().includes(search.toLowerCase()))
+        tx.fromAccount?.name?.toLowerCase().includes(search.toLowerCase()) ||
+        tx.toAccount?.name?.toLowerCase().includes(search.toLowerCase()))
   );
 
   const handleCreate = useCallback(async () => {
@@ -83,11 +83,11 @@ export default function LinkTransferPairModal({
     try {
       const relation = await createRelation({ type: 'transfer_pair' });
       await addMember(relation.id, {
-        transaction_id: sourceTransaction.id,
+        transactionId: sourceTransaction.id,
         role: 'outgoing',
       });
       await addMember(relation.id, {
-        transaction_id: selectedTx.id,
+        transactionId: selectedTx.id,
         role: 'incoming',
       });
       onSuccess();
@@ -129,7 +129,7 @@ export default function LinkTransferPairModal({
             }}
           >
             <strong>{formatDate(sourceTransaction.date)}</strong> —{' '}
-            {sourceTransaction.from_account?.name ?? '—'} → {sourceTransaction.to_account?.name ?? '—'}{' '}
+            {sourceTransaction.fromAccount?.name ?? '—'} → {sourceTransaction.toAccount?.name ?? '—'}{' '}
             — <span style={{ color: '#2563eb' }}>{formatAmount(sourceTransaction.amount, sourceTransaction.type)}</span>
           </div>
         </div>
@@ -193,8 +193,8 @@ export default function LinkTransferPairModal({
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span>
-                    <strong>{formatDate(tx.date)}</strong> — {tx.from_account?.name ?? '—'} →{' '}
-                    {tx.to_account?.name ?? '—'}
+                    <strong>{formatDate(tx.date)}</strong> — {tx.fromAccount?.name ?? '—'} →{' '}
+                    {tx.toAccount?.name ?? '—'}
                   </span>
                   <span style={{ color: '#2563eb', fontWeight: 600 }}>
                     {formatAmount(tx.amount, tx.type)}

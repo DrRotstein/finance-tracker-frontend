@@ -52,8 +52,8 @@ function formatDate(dateStr: string): string {
 }
 
 function getAccountDisplay(transaction: Transaction): string {
-  const from = transaction.from_account?.name ?? '—';
-  const to = transaction.to_account?.name ?? '—';
+  const from = transaction.fromAccount?.name ?? '—';
+  const to = transaction.toAccount?.name ?? '—';
   if (transaction.type === 'transfer') {
     return `${from} → ${to}`;
   }

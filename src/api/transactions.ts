@@ -5,14 +5,14 @@ export interface Transaction {
   amount: number;
   category: string;
   description: string;
-  from_account: { id: string; name: string } | null;
-  to_account: { id: string; name: string } | null;
+  fromAccount: { id: string; name: string } | null;
+  toAccount: { id: string; name: string } | null;
 }
 
 export interface TransactionsResponse {
   transactions: Transaction[];
   total: number;
-  offset: number;
+  page: number;
   limit: number;
 }
 
@@ -22,15 +22,15 @@ export interface TransactionFilters {
   type?: string;
   account_id?: string;
   category?: string;
-  offset?: number;
+  page?: number;
   limit?: number;
 }
 
 export interface CreateTransactionPayload {
   type: 'expense' | 'income' | 'transfer';
   amount: number;
-  from_account_id?: string | null;
-  to_account_id?: string | null;
+  fromAccountId?: string | null;
+  toAccountId?: string | null;
   date: string;
   category: string;
   description?: string;
@@ -39,8 +39,8 @@ export interface CreateTransactionPayload {
 export interface UpdateTransactionPayload {
   type?: 'expense' | 'income' | 'transfer';
   amount?: number;
-  from_account_id?: string | null;
-  to_account_id?: string | null;
+  fromAccountId?: string | null;
+  toAccountId?: string | null;
   date?: string;
   category?: string;
   description?: string;
@@ -58,14 +58,20 @@ export async function fetchTransactions(
   if (filters.type) params.set('type', filters.type);
   if (filters.account_id) params.set('account_id', filters.account_id);
   if (filters.category) params.set('category', filters.category);
-  params.set('offset', String(filters.offset ?? 0));
+  params.set('page', String(filters.page ?? 1));
   params.set('limit', String(filters.limit ?? 20));
 
   const response = await fetch(`${API_BASE}/transactions?${params.toString()}`);
   if (!response.ok) {
     throw new Error(`Failed to fetch transactions: ${response.status}`);
   }
-  return response.json();
+  const json = await response.json();
+  return {
+    transactions: json.data,
+    total: json.meta.total,
+    page: json.meta.page,
+    limit: json.meta.limit,
+  };
 }
 
 export async function fetchTransaction(id: string): Promise<Transaction> {

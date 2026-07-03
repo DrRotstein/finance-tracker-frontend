@@ -8,8 +8,8 @@ export interface OutstandingTransfer {
   date: string;
   description: string;
   direction: 'sent' | 'received';
-  from_account: { id: string; name: string };
-  to_account: { id: string; name: string };
+  fromAccount: { id: string; name: string };
+  toAccount: { id: string; name: string };
   type: string;
 }
 
@@ -18,7 +18,7 @@ export interface OutstandingTransfer {
 export type RelationType = 'transfer_pair' | 'group';
 
 export interface RelationMember {
-  transaction_id: string;
+  transactionId: string;
   role: string;
   transaction?: Transaction;
 }
@@ -28,7 +28,7 @@ export interface Relation {
   type: RelationType;
   label?: string;
   members: RelationMember[];
-  created_at: string;
+  createdAt: string;
 }
 
 export interface CreateRelationPayload {
@@ -37,7 +37,7 @@ export interface CreateRelationPayload {
 }
 
 export interface AddMemberPayload {
-  transaction_id: string;
+  transactionId: string;
   role: string;
 }
 
@@ -50,7 +50,8 @@ export async function fetchOutstandingTransfers(): Promise<OutstandingTransfer[]
   if (!response.ok) {
     throw new Error(`Failed to fetch outstanding transfers: ${response.status}`);
   }
-  return response.json();
+  const json = await response.json();
+  return json.data;
 }
 
 export async function dismissRelation(id: string): Promise<void> {
@@ -70,7 +71,7 @@ export async function addRelationMember(
   const response = await fetch(`${API_BASE}/relations/${relationId}/members`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ transaction_id: transactionId }),
+    body: JSON.stringify({ transactionId }),
   });
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
@@ -130,7 +131,7 @@ export async function fetchRelation(id: string): Promise<Relation> {
 
 export async function fetchRelationsForTransaction(transactionId: string): Promise<Relation[]> {
   const params = new URLSearchParams();
-  params.set('transaction_id', transactionId);
+  params.set('transactionId', transactionId);
   const response = await fetch(`${API_BASE}/relations?${params.toString()}`);
   if (!response.ok) {
     throw new Error(`Failed to fetch relations for transaction: ${response.status}`);

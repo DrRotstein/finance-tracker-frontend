@@ -78,7 +78,7 @@ function OutstandingCard({
             {directionLabel}
           </span>
           <div style={{ fontSize: '0.9375rem', fontWeight: 600, color: '#1e293b', marginTop: '0.25rem' }}>
-            {item.from_account.name} → {item.to_account.name}
+            {item.fromAccount.name} → {item.toAccount.name}
           </div>
         </div>
         <span
@@ -237,8 +237,8 @@ export default function OutstandingTransfersPage() {
     const params = new URLSearchParams({
       type: 'transfer',
       amount: String(item.amount),
-      from_account_id: item.to_account.id,
-      to_account_id: item.from_account.id,
+      from_account_id: item.toAccount.id,
+      to_account_id: item.fromAccount.id,
       description: `Return: ${item.description || 'transfer'}`,
     });
     navigate(`/transactions/new?${params.toString()}`);
