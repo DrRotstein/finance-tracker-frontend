@@ -4,16 +4,16 @@ export interface AccountBalance {
   id: string;
   name: string;
   type: string;
-  current_balance: number;
+  currentBalance: number;
   currency?: string;
-  is_external?: boolean;
+  isExternal?: boolean;
 }
 
 export interface MonthlySummary {
   month: string;
-  total_income: number;
-  total_expenses: number;
-  total_transfers: number;
+  totalIncome: number;
+  totalExpenses: number;
+  totalTransfers: number;
 }
 
 export async function fetchAccountBalances(): Promise<AccountBalance[]> {
@@ -21,7 +21,8 @@ export async function fetchAccountBalances(): Promise<AccountBalance[]> {
   if (!response.ok) {
     throw new Error(`Failed to fetch account balances: ${response.status}`);
   }
-  return response.json();
+  const json = await response.json();
+  return json.accounts;
 }
 
 export async function fetchMonthlySummary(): Promise<MonthlySummary[]> {
@@ -29,5 +30,6 @@ export async function fetchMonthlySummary(): Promise<MonthlySummary[]> {
   if (!response.ok) {
     throw new Error(`Failed to fetch monthly summary: ${response.status}`);
   }
-  return response.json();
+  const json = await response.json();
+  return json.months;
 }

@@ -24,10 +24,10 @@ export default function AccountForm({ account, onSave, onCancel, saving }: Accou
   const [name, setName] = useState(account?.name || '');
   const [type, setType] = useState(account?.type || 'bank');
   const [startingBalance, setStartingBalance] = useState(
-    account ? String(account.starting_balance ?? 0) : '0'
+    account ? String(account.startingBalance ?? 0) : '0'
   );
   const [currency, setCurrency] = useState(account?.currency || 'EUR');
-  const [isExternal, setIsExternal] = useState(account?.is_external || false);
+  const [isExternal, setIsExternal] = useState(account?.isExternal || false);
   const [validationError, setValidationError] = useState<string | null>(null);
 
   const nameRef = useRef<HTMLInputElement>(null);
@@ -56,9 +56,9 @@ export default function AccountForm({ account, onSave, onCancel, saving }: Accou
     const payload: CreateAccountPayload = {
       name: trimmedName,
       type,
-      starting_balance: balance,
+      startingBalance: balance,
       currency,
-      is_external: isExternal,
+      isExternal,
     };
 
     await onSave(payload);

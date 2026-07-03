@@ -71,8 +71,8 @@ export default function GroupTransactionsModal({
       search === '' ||
       tx.description?.toLowerCase().includes(search.toLowerCase()) ||
       tx.category.toLowerCase().includes(search.toLowerCase()) ||
-      tx.from_account?.name?.toLowerCase().includes(search.toLowerCase()) ||
-      tx.to_account?.name?.toLowerCase().includes(search.toLowerCase())
+      tx.fromAccount?.name?.toLowerCase().includes(search.toLowerCase()) ||
+      tx.toAccount?.name?.toLowerCase().includes(search.toLowerCase())
   );
 
   const toggleSelect = useCallback((id: string) => {
@@ -102,7 +102,7 @@ export default function GroupTransactionsModal({
       const relation = await createRelation({ type: 'group', label: label.trim() });
       for (const txId of selectedIds) {
         await addMember(relation.id, {
-          transaction_id: txId,
+          transactionId: txId,
           role: 'member',
         });
       }

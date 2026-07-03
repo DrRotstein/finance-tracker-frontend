@@ -16,8 +16,8 @@ interface TransactionFormProps {
 
 interface FormErrors {
   amount?: string;
-  from_account_id?: string;
-  to_account_id?: string;
+  fromAccountId?: string;
+  toAccountId?: string;
   date?: string;
   category?: string;
 }
@@ -39,8 +39,8 @@ export default function TransactionForm({
 
   const [type, setType] = useState<TransactionType>(transaction?.type || 'expense');
   const [amount, setAmount] = useState(transaction ? String(transaction.amount) : '');
-  const [fromAccountId, setFromAccountId] = useState(transaction?.from_account?.id || '');
-  const [toAccountId, setToAccountId] = useState(transaction?.to_account?.id || '');
+  const [fromAccountId, setFromAccountId] = useState(transaction?.fromAccount?.id || '');
+  const [toAccountId, setToAccountId] = useState(transaction?.toAccount?.id || '');
   const [date, setDate] = useState(transaction?.date?.split('T')[0] || getTodayString());
   const [category, setCategory] = useState(transaction?.category || '');
   const [description, setDescription] = useState(transaction?.description || '');
@@ -73,18 +73,18 @@ export default function TransactionForm({
 
     if (type === 'expense' || type === 'transfer') {
       if (!fromAccountId) {
-        errs.from_account_id = 'From account is required';
+        errs.fromAccountId = 'From account is required';
       }
     }
 
     if (type === 'income' || type === 'transfer') {
       if (!toAccountId) {
-        errs.to_account_id = 'To account is required';
+        errs.toAccountId = 'To account is required';
       }
     }
 
     if (type === 'transfer' && fromAccountId && toAccountId && fromAccountId === toAccountId) {
-      errs.to_account_id = 'From and To accounts must be different';
+      errs.toAccountId = 'From and To accounts must be different';
     }
 
     if (!date) {
@@ -102,8 +102,8 @@ export default function TransactionForm({
     return {
       type,
       amount: parseFloat(amount),
-      from_account_id: (type === 'expense' || type === 'transfer') ? fromAccountId : null,
-      to_account_id: (type === 'income' || type === 'transfer') ? toAccountId : null,
+      fromAccountId: (type === 'expense' || type === 'transfer') ? fromAccountId : null,
+      toAccountId: (type === 'income' || type === 'transfer') ? toAccountId : null,
       date,
       category,
       description: description.trim() || undefined,
@@ -247,7 +247,7 @@ export default function TransactionForm({
             id="txn-from-account"
             value={fromAccountId}
             onChange={(e) => setFromAccountId(e.target.value)}
-            style={errors.from_account_id ? inputErrorStyle : inputStyle}
+            style={errors.fromAccountId ? inputErrorStyle : inputStyle}
           >
             <option value="">— Select account —</option>
             {accounts.map((acc) => (
@@ -256,7 +256,7 @@ export default function TransactionForm({
               </option>
             ))}
           </select>
-          {errors.from_account_id && <p style={errorTextStyle}>{errors.from_account_id}</p>}
+          {errors.fromAccountId && <p style={errorTextStyle}>{errors.fromAccountId}</p>}
         </div>
       )}
 
@@ -270,7 +270,7 @@ export default function TransactionForm({
             id="txn-to-account"
             value={toAccountId}
             onChange={(e) => setToAccountId(e.target.value)}
-            style={errors.to_account_id ? inputErrorStyle : inputStyle}
+            style={errors.toAccountId ? inputErrorStyle : inputStyle}
           >
             <option value="">— Select account —</option>
             {accounts.map((acc) => (
@@ -279,7 +279,7 @@ export default function TransactionForm({
               </option>
             ))}
           </select>
-          {errors.to_account_id && <p style={errorTextStyle}>{errors.to_account_id}</p>}
+          {errors.toAccountId && <p style={errorTextStyle}>{errors.toAccountId}</p>}
         </div>
       )}
 

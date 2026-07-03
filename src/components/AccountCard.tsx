@@ -8,7 +8,7 @@ interface AccountCardProps {
 
 export default function AccountCard({ account, onEdit, onDelete }: AccountCardProps) {
   const currencySymbol = account.currency === 'USD' ? '$' : account.currency === 'EUR' ? '€' : account.currency === 'ILS' ? '₪' : account.currency === 'GBP' ? '£' : account.currency || '$';
-  const balanceColor = account.balance < 0 ? '#d32f2f' : '#2e7d32';
+  const balanceColor = account.currentBalance < 0 ? '#d32f2f' : '#2e7d32';
 
   return (
     <div
@@ -25,7 +25,7 @@ export default function AccountCard({ account, onEdit, onDelete }: AccountCardPr
       <div style={{ flex: 1, cursor: 'pointer' }} onClick={() => onEdit(account)}>
         <h3 style={{ margin: 0 }}>
           {account.name}
-          {account.is_external && (
+          {account.isExternal && (
             <span style={{ fontSize: '0.75rem', color: '#888', marginLeft: '0.5rem' }}>
               (external)
             </span>
@@ -37,7 +37,7 @@ export default function AccountCard({ account, onEdit, onDelete }: AccountCardPr
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
         <span style={{ fontWeight: 600, fontSize: '1.125rem', color: balanceColor }}>
-          {currencySymbol}{account.balance.toFixed(2)}
+          {currencySymbol}{account.currentBalance.toFixed(2)}
         </span>
         <button
           onClick={() => onEdit(account)}

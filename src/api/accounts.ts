@@ -2,26 +2,26 @@ export interface Account {
   id: string;
   name: string;
   type: string;
-  starting_balance: number;
+  startingBalance: number;
   currency: string;
-  is_external: boolean;
-  balance: number;
+  isExternal: boolean;
+  currentBalance: number;
 }
 
 export interface CreateAccountPayload {
   name: string;
   type: string;
-  starting_balance: number;
+  startingBalance: number;
   currency: string;
-  is_external: boolean;
+  isExternal: boolean;
 }
 
 export interface UpdateAccountPayload {
   name?: string;
   type?: string;
-  starting_balance?: number;
+  startingBalance?: number;
   currency?: string;
-  is_external?: boolean;
+  isExternal?: boolean;
 }
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000';

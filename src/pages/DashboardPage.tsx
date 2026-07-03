@@ -48,7 +48,7 @@ function BalanceCardSkeleton() {
 }
 
 function BalanceCard({ account }: { account: AccountBalance }) {
-  const balanceColor = account.current_balance < 0 ? '#dc2626' : '#16a34a';
+  const balanceColor = account.currentBalance < 0 ? '#dc2626' : '#16a34a';
 
   return (
     <div style={styles.balanceCard}>
@@ -66,7 +66,7 @@ function BalanceCard({ account }: { account: AccountBalance }) {
           color: balanceColor,
         }}
       >
-        {formatCurrency(account.current_balance, account.currency)}
+        {formatCurrency(account.currentBalance, account.currency)}
       </p>
     </div>
   );
@@ -89,8 +89,8 @@ function AccountBalancesSection({ balances, isLoading, error }: {
     );
   }
 
-  const nonExternal = balances?.filter((a) => !a.is_external) ?? [];
-  const total = nonExternal.reduce((sum, a) => sum + a.current_balance, 0);
+  const nonExternal = balances?.filter((a) => !a.isExternal) ?? [];
+  const total = nonExternal.reduce((sum, a) => sum + a.currentBalance, 0);
 
   return (
     <section style={styles.section}>
@@ -130,7 +130,7 @@ function MonthlySummarySection({ summaries, isLoading, error }: {
   const [selectedMonth, setSelectedMonth] = useState(getCurrentMonthStr());
 
   const currentSummary = summaries?.find((s) => s.month === selectedMonth);
-  const net = (currentSummary?.total_income ?? 0) - (currentSummary?.total_expenses ?? 0);
+  const net = (currentSummary?.totalIncome ?? 0) - (currentSummary?.totalExpenses ?? 0);
 
   if (error) {
     return (
@@ -185,13 +185,13 @@ function MonthlySummarySection({ summaries, isLoading, error }: {
           <div style={{ ...styles.summaryCard, borderLeft: '4px solid #16a34a' }}>
             <span style={styles.summaryLabel}>Income</span>
             <span style={{ ...styles.summaryValue, color: '#16a34a' }}>
-              {formatCurrency(currentSummary.total_income)}
+              {formatCurrency(currentSummary.totalIncome)}
             </span>
           </div>
           <div style={{ ...styles.summaryCard, borderLeft: '4px solid #dc2626' }}>
             <span style={styles.summaryLabel}>Expenses</span>
             <span style={{ ...styles.summaryValue, color: '#dc2626' }}>
-              {formatCurrency(currentSummary.total_expenses)}
+              {formatCurrency(currentSummary.totalExpenses)}
             </span>
           </div>
           <div style={{ ...styles.summaryCard, borderLeft: `4px solid ${net >= 0 ? '#16a34a' : '#dc2626'}` }}>
@@ -203,7 +203,7 @@ function MonthlySummarySection({ summaries, isLoading, error }: {
           <div style={{ ...styles.summaryCard, borderLeft: '4px solid #2563eb' }}>
             <span style={styles.summaryLabel}>Transfers</span>
             <span style={{ ...styles.summaryValue, color: '#2563eb' }}>
-              {formatCurrency(currentSummary.total_transfers)}
+              {formatCurrency(currentSummary.totalTransfers)}
             </span>
           </div>
         </div>

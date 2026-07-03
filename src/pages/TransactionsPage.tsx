@@ -37,7 +37,7 @@ function formatMonthLabel(key: string): string {
 }
 
 function getRelationsForTransaction(txId: string, relations: Relation[]): Relation[] {
-  return relations.filter((r) => r.members.some((m) => m.transaction_id === txId));
+  return relations.filter((r) => r.members.some((m) => m.transactionId === txId));
 }
 
 export default function TransactionsPage() {
@@ -51,6 +51,7 @@ export default function TransactionsPage() {
   const dateFrom = searchParams.get('date_from') || '';
   const dateTo = searchParams.get('date_to') || '';
   const offset = Number(searchParams.get('offset') || '0');
+  const page = Math.floor(offset / LIMIT) + 1;
 
   // Modal state
   const [linkPairTarget, setLinkPairTarget] = useState<Transaction | null>(null);
@@ -93,7 +94,7 @@ export default function TransactionsPage() {
     error,
     isFetching,
   } = useQuery({
-    queryKey: ['transactions', { type, accountId, category, dateFrom, dateTo, offset }],
+    queryKey: ['transactions', { type, accountId, category, dateFrom, dateTo, page }],
     queryFn: () =>
       fetchTransactions({
         type: type || undefined,
@@ -101,7 +102,7 @@ export default function TransactionsPage() {
         category: category || undefined,
         date_from: dateFrom || undefined,
         date_to: dateTo || undefined,
-        offset,
+        page,
         limit: LIMIT,
       }),
     placeholderData: keepPreviousData,
