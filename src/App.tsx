@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AccountsPage from './pages/AccountsPage';
 import TransactionsPage from './pages/TransactionsPage';
+import TransactionFormPage from './pages/TransactionFormPage';
 import NavBar from './components/NavBar';
 
 const queryClient = new QueryClient({
@@ -21,6 +22,8 @@ function App() {
         <Routes>
           <Route path="/accounts" element={<AccountsPage />} />
           <Route path="/transactions" element={<TransactionsPage />} />
+          <Route path="/transactions/new" element={<TransactionFormPage />} />
+          <Route path="/transactions/:id" element={<TransactionFormPage />} />
           <Route path="*" element={<Navigate to="/accounts" replace />} />
         </Routes>
       </BrowserRouter>
