@@ -1,4 +1,6 @@
 import { NavLink } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { fetchOutstandingTransfers } from '../api/relations';
 
 const linkStyle: React.CSSProperties = {
   textDecoration: 'none',
@@ -8,6 +10,10 @@ const linkStyle: React.CSSProperties = {
   fontWeight: 500,
   color: '#475569',
   transition: 'background-color 0.15s, color 0.15s',
+  position: 'relative',
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '0.375rem',
 };
 
 const activeLinkStyle: React.CSSProperties = {
@@ -17,6 +23,14 @@ const activeLinkStyle: React.CSSProperties = {
 };
 
 export default function NavBar() {
+  const { data: outstanding } = useQuery({
+    queryKey: ['outstanding-transfers'],
+    queryFn: fetchOutstandingTransfers,
+    refetchInterval: 30000,
+  });
+
+  const outstandingCount = outstanding?.length ?? 0;
+
   return (
     <nav
       style={{
@@ -41,6 +55,29 @@ export default function NavBar() {
         style={({ isActive }) => (isActive ? activeLinkStyle : linkStyle)}
       >
         📋 Transactions
+      </NavLink>
+      <NavLink
+        to="/outstanding"
+        style={({ isActive }) => (isActive ? activeLinkStyle : linkStyle)}
+      >
+        🔗 Outstanding
+        {outstandingCount > 0 && (
+          <span
+            style={{
+              backgroundColor: '#ef4444',
+              color: '#fff',
+              fontSize: '0.6875rem',
+              fontWeight: 700,
+              borderRadius: '9999px',
+              padding: '0.125rem 0.375rem',
+              minWidth: '1.125rem',
+              textAlign: 'center',
+              lineHeight: '1.2',
+            }}
+          >
+            {outstandingCount}
+          </span>
+        )}
       </NavLink>
     </nav>
   );
