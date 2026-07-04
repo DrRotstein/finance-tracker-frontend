@@ -1,13 +1,23 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import type { Transaction, CreateTransactionPayload } from '../api/transactions';
 import { CATEGORY_PRESETS } from '../api/transactions';
 import type { Account } from '../api/accounts';
 
 type TransactionType = 'expense' | 'income' | 'transfer';
 
+export interface TransactionFormInitialValues {
+  type?: TransactionType;
+  amount?: string;
+  fromAccountId?: string;
+  toAccountId?: string;
+  description?: string;
+  category?: string;
+}
+
 interface TransactionFormProps {
   transaction?: Transaction | null;
   accounts: Account[];
+  initialValues?: TransactionFormInitialValues;
   onSave: (data: CreateTransactionPayload) => Promise<void>;
   onSaveAndNew: (data: CreateTransactionPayload) => Promise<void>;
   onCancel: () => void;
@@ -30,6 +40,7 @@ function getTodayString(): string {
 export default function TransactionForm({
   transaction,
   accounts,
+  initialValues,
   onSave,
   onSaveAndNew,
   onCancel,
@@ -37,13 +48,25 @@ export default function TransactionForm({
 }: TransactionFormProps) {
   const isEdit = !!transaction;
 
-  const [type, setType] = useState<TransactionType>(transaction?.type || 'expense');
-  const [amount, setAmount] = useState(transaction ? String(transaction.amount) : '');
-  const [fromAccountId, setFromAccountId] = useState(transaction?.fromAccount?.id || '');
-  const [toAccountId, setToAccountId] = useState(transaction?.toAccount?.id || '');
+  const [type, setType] = useState<TransactionType>(
+    transaction?.type || initialValues?.type || 'expense'
+  );
+  const [amount, setAmount] = useState(
+    transaction ? String(transaction.amount) : initialValues?.amount || ''
+  );
+  const [fromAccountId, setFromAccountId] = useState(
+    transaction?.fromAccount?.id || initialValues?.fromAccountId || ''
+  );
+  const [toAccountId, setToAccountId] = useState(
+    transaction?.toAccount?.id || initialValues?.toAccountId || ''
+  );
   const [date, setDate] = useState(transaction?.date?.split('T')[0] || getTodayString());
-  const [category, setCategory] = useState(transaction?.category || '');
-  const [description, setDescription] = useState(transaction?.description || '');
+  const [category, setCategory] = useState(
+    transaction?.category || initialValues?.category || ''
+  );
+  const [description, setDescription] = useState(
+    transaction?.description || initialValues?.description || ''
+  );
   const [errors, setErrors] = useState<FormErrors>({});
 
   const amountRef = useRef<HTMLInputElement>(null);
@@ -62,6 +85,21 @@ export default function TransactionForm({
       }
     }
   }, [type, isEdit]);
+
+  // Determine if either selected account is external (person)
+  const isExternalTransfer = useMemo(() => {
+    if (type !== 'transfer') return false;
+    const fromAcc = accounts.find((a) => a.id === fromAccountId);
+    const toAcc = accounts.find((a) => a.id === toAccountId);
+    return !!(fromAcc?.isExternal || toAcc?.isExternal);
+  }, [type, fromAccountId, toAccountId, accounts]);
+
+  // Auto-set category to 'transfer' when it's an external transfer
+  useEffect(() => {
+    if (isExternalTransfer) {
+      setCategory('transfer');
+    }
+  }, [isExternalTransfer]);
 
   function validate(): FormErrors {
     const errs: FormErrors = {};
@@ -91,7 +129,7 @@ export default function TransactionForm({
       errs.date = 'Date is required';
     }
 
-    if (!category) {
+    if (!category && !isExternalTransfer) {
       errs.category = 'Category is required';
     }
 
@@ -298,26 +336,45 @@ export default function TransactionForm({
         {errors.date && <p style={errorTextStyle}>{errors.date}</p>}
       </div>
 
-      {/* Category */}
-      <div style={{ marginBottom: '1rem' }}>
-        <label htmlFor="txn-category" style={labelStyle}>
-          Category *
-        </label>
-        <select
-          id="txn-category"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          style={errors.category ? inputErrorStyle : inputStyle}
-        >
-          <option value="">— Select category —</option>
-          {CATEGORY_PRESETS.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat.charAt(0).toUpperCase() + cat.slice(1)}
-            </option>
-          ))}
-        </select>
-        {errors.category && <p style={errorTextStyle}>{errors.category}</p>}
-      </div>
+      {/* Category — hidden when it's an external transfer (auto-set to 'transfer') */}
+      {!isExternalTransfer && (
+        <div style={{ marginBottom: '1rem' }}>
+          <label htmlFor="txn-category" style={labelStyle}>
+            Category *
+          </label>
+          <select
+            id="txn-category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            style={errors.category ? inputErrorStyle : inputStyle}
+          >
+            <option value="">— Select category —</option>
+            {CATEGORY_PRESETS.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat.charAt(0).toUpperCase() + cat.slice(1)}
+              </option>
+            ))}
+          </select>
+          {errors.category && <p style={errorTextStyle}>{errors.category}</p>}
+        </div>
+      )}
+      {isExternalTransfer && (
+        <div style={{ marginBottom: '1rem' }}>
+          <label style={labelStyle}>Category</label>
+          <div
+            style={{
+              padding: '0.5rem',
+              borderRadius: '4px',
+              border: '1px solid #e2e8f0',
+              backgroundColor: '#f1f5f9',
+              fontSize: '0.875rem',
+              color: '#475569',
+            }}
+          >
+            Transfer (auto-set for external accounts)
+          </div>
+        </div>
+      )}
 
       {/* Description */}
       <div style={{ marginBottom: '1.5rem' }}>

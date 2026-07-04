@@ -125,6 +125,8 @@ export const CATEGORY_PRESETS = [
   'education',
   'shopping',
   'gifts',
+  'transfer',
+  'loan',
   'other',
 ] as const;
 
