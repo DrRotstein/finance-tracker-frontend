@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   fetchTransaction,
@@ -9,16 +9,42 @@ import {
 import type { CreateTransactionPayload, UpdateTransactionPayload } from '../api/transactions';
 import { fetchAccounts } from '../api/accounts';
 import TransactionForm from '../components/TransactionForm';
+import type { TransactionFormInitialValues } from '../components/TransactionForm';
 import { ToastContainer, useToasts } from '../components/Toast';
 
 export default function TransactionFormPage() {
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const isEdit = !!id && id !== 'new';
 
   const { toasts, addToast, dismissToast } = useToasts();
   const [saving, setSaving] = useState(false);
+
+  // Build initial values from URL search params (used by "Log return" flow)
+  const initialValues: TransactionFormInitialValues | undefined = (() => {
+    const type = searchParams.get('type');
+    if (!type) return undefined;
+
+    const values: TransactionFormInitialValues = {};
+    if (type === 'expense' || type === 'income' || type === 'transfer') {
+      values.type = type;
+    }
+    const amount = searchParams.get('amount');
+    if (amount) values.amount = amount;
+
+    const fromAccountId = searchParams.get('from_account_id');
+    if (fromAccountId) values.fromAccountId = fromAccountId;
+
+    const toAccountId = searchParams.get('to_account_id');
+    if (toAccountId) values.toAccountId = toAccountId;
+
+    const description = searchParams.get('description');
+    if (description) values.description = description;
+
+    return values;
+  })();
 
   // Fetch accounts for dropdowns
   const {
@@ -45,6 +71,7 @@ export default function TransactionFormPage() {
     mutationFn: createTransaction,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['outstanding-transfers'] });
     },
   });
 
@@ -54,6 +81,7 @@ export default function TransactionFormPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
       queryClient.invalidateQueries({ queryKey: ['transaction', id] });
+      queryClient.invalidateQueries({ queryKey: ['outstanding-transfers'] });
     },
   });
 
@@ -67,7 +95,12 @@ export default function TransactionFormPage() {
       } else {
         await createMutation.mutateAsync(data);
         addToast('Transaction created!', 'success');
-        setTimeout(() => navigate('/transactions'), 600);
+        // If this was a "log return" flow, go back to outstanding transfers
+        if (searchParams.get('from_account_id') && searchParams.get('to_account_id')) {
+          setTimeout(() => navigate('/transfers/outstanding'), 600);
+        } else {
+          setTimeout(() => navigate('/transactions'), 600);
+        }
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'An error occurred';
@@ -91,7 +124,12 @@ export default function TransactionFormPage() {
   }
 
   function handleCancel() {
-    navigate('/transactions');
+    // If coming from outstanding transfers, go back there
+    if (searchParams.get('from_account_id') && searchParams.get('to_account_id')) {
+      navigate('/transfers/outstanding');
+    } else {
+      navigate('/transactions');
+    }
   }
 
   // Loading states
@@ -129,6 +167,7 @@ export default function TransactionFormPage() {
       <TransactionForm
         transaction={isEdit ? transaction : null}
         accounts={accounts}
+        initialValues={initialValues}
         onSave={handleSave}
         onSaveAndNew={handleSaveAndNew}
         onCancel={handleCancel}
