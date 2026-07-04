@@ -99,7 +99,7 @@ export default function TransactionsPage() {
       fetchTransactions({
         type: type || undefined,
         account_id: accountId || undefined,
-        category: category || undefined,
+        category_id: category || undefined,
         date_from: dateFrom || undefined,
         date_to: dateTo || undefined,
         page,

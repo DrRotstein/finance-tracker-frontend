@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import type { Transaction, CreateTransactionPayload } from '../api/transactions';
-import { CATEGORY_PRESETS } from '../api/transactions';
+import { useQuery } from '@tanstack/react-query';
+import { fetchCategories } from '../api/categories';
 import type { Account } from '../api/accounts';
 
 type TransactionType = 'expense' | 'income' | 'transfer';
@@ -62,8 +63,13 @@ export default function TransactionForm({
   );
   const [date, setDate] = useState(transaction?.date?.split('T')[0] || getTodayString());
   const [category, setCategory] = useState(
-    transaction?.category || initialValues?.category || ''
+    transaction?.categoryId || initialValues?.category || ''
   );
+
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: fetchCategories,
+  });
   const [description, setDescription] = useState(
     transaction?.description || initialValues?.description || ''
   );
@@ -143,7 +149,7 @@ export default function TransactionForm({
       fromAccountId: (type === 'expense' || type === 'transfer') ? fromAccountId : null,
       toAccountId: (type === 'income' || type === 'transfer') ? toAccountId : null,
       date,
-      category,
+      categoryId: category || null,
       description: description.trim() || undefined,
     };
   }
@@ -349,9 +355,9 @@ export default function TransactionForm({
             style={errors.category ? inputErrorStyle : inputStyle}
           >
             <option value="">— Select category —</option>
-            {CATEGORY_PRESETS.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat.charAt(0).toUpperCase() + cat.slice(1)}
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
               </option>
             ))}
           </select>
