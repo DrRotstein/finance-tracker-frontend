@@ -174,7 +174,7 @@ export default function LoansPage() {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <span style={{ fontSize: '1rem', fontWeight: 700, color: loan.balance >= 0 ? '#16a34a' : '#dc2626' }}>
-              €{Math.abs(loan.balance).toFixed(2)}
+              €{Math.abs(Number(loan.balance)).toFixed(2)}
             </span>
             <span style={{ fontSize: '0.875rem', color: '#64748b' }}>
               {isExpanded ? '▲' : '▼'}
@@ -197,7 +197,7 @@ export default function LoansPage() {
                       {t.description || t.type}
                     </span>
                     <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: t.type === 'income' ? '#16a34a' : '#dc2626' }}>
-                      {t.type === 'income' ? '+' : '-'}€{t.amount.toFixed(2)}
+                      {t.type === 'income' ? '+' : '-'}€{Number(t.amount).toFixed(2)}
                     </span>
                   </div>
                 ))}
