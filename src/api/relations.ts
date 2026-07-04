@@ -1,5 +1,4 @@
 import type { Transaction } from './transactions';
-import { API_BASE } from './config';
 
 // === Outstanding Transfer types (from main) ===
 
@@ -42,6 +41,7 @@ export interface AddMemberPayload {
   role: string;
 }
 
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 // === Outstanding Transfer functions (from main) ===
 

@@ -1,5 +1,3 @@
-import { API_BASE } from './config';
-
 export interface Account {
   id: string;
   name: string;
@@ -26,6 +24,7 @@ export interface UpdateAccountPayload {
   isExternal?: boolean;
 }
 
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 export async function fetchAccounts(): Promise<Account[]> {
   const response = await fetch(`${API_BASE}/accounts`);
