@@ -3,7 +3,8 @@ export interface Transaction {
   date: string;
   type: 'expense' | 'income' | 'transfer';
   amount: number;
-  category: string;
+  categoryId: string | null;
+  category: { id: string; name: string } | null;
   description: string;
   fromAccount: { id: string; name: string } | null;
   toAccount: { id: string; name: string } | null;
@@ -21,7 +22,7 @@ export interface TransactionFilters {
   date_to?: string;
   type?: string;
   account_id?: string;
-  category?: string;
+  category_id?: string;
   page?: number;
   limit?: number;
 }
@@ -32,7 +33,7 @@ export interface CreateTransactionPayload {
   fromAccountId?: string | null;
   toAccountId?: string | null;
   date: string;
-  category: string;
+  categoryId: string | null;
   description?: string;
 }
 
@@ -42,7 +43,7 @@ export interface UpdateTransactionPayload {
   fromAccountId?: string | null;
   toAccountId?: string | null;
   date?: string;
-  category?: string;
+  categoryId?: string | null;
   description?: string;
 }
 
@@ -57,7 +58,7 @@ export async function fetchTransactions(
   if (filters.date_to) params.set('date_to', filters.date_to);
   if (filters.type) params.set('type', filters.type);
   if (filters.account_id) params.set('account_id', filters.account_id);
-  if (filters.category) params.set('category', filters.category);
+  if (filters.category_id) params.set('category_id', filters.category_id);
   params.set('page', String(filters.page ?? 1));
   params.set('limit', String(filters.limit ?? 20));
 
@@ -110,24 +111,3 @@ export async function updateTransaction(
   }
   return response.json();
 }
-
-export const CATEGORY_PRESETS = [
-  'groceries',
-  'transport',
-  'food & drink',
-  'entertainment',
-  'salary',
-  'freelance',
-  'rent',
-  'utilities',
-  'subscription',
-  'health',
-  'education',
-  'shopping',
-  'gifts',
-  'transfer',
-  'loan',
-  'other',
-] as const;
-
-export type CategoryPreset = (typeof CATEGORY_PRESETS)[number];
