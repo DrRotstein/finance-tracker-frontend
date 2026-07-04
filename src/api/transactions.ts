@@ -1,3 +1,5 @@
+import { API_BASE } from './config';
+
 export interface Transaction {
   id: string;
   date: string;
@@ -46,7 +48,6 @@ export interface UpdateTransactionPayload {
   description?: string;
 }
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 export async function fetchTransactions(
   filters: TransactionFilters = {}
