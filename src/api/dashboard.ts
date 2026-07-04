@@ -14,7 +14,6 @@ export interface MonthlySummary {
   totalIncome: number;
   totalExpenses: number;
   totalTransfers: number;
-  loanDifference: number;
 }
 
 export async function fetchAccountBalances(): Promise<AccountBalance[]> {
@@ -26,11 +25,16 @@ export async function fetchAccountBalances(): Promise<AccountBalance[]> {
   return json.accounts;
 }
 
-export async function fetchMonthlySummary(): Promise<MonthlySummary[]> {
+export interface MonthlySummaryResponse {
+  months: MonthlySummary[];
+  loanDifference: number;
+}
+
+export async function fetchMonthlySummary(): Promise<MonthlySummaryResponse> {
   const response = await fetch(`${API_BASE}/transactions/monthly-summary`);
   if (!response.ok) {
     throw new Error(`Failed to fetch monthly summary: ${response.status}`);
   }
   const json = await response.json();
-  return json.months;
+  return { months: json.months, loanDifference: json.loanDifference ?? 0 };
 }

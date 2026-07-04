@@ -5,7 +5,7 @@ import {
   fetchAccountBalances,
   fetchMonthlySummary,
   type AccountBalance,
-  type MonthlySummary,
+  type MonthlySummaryResponse,
 } from '../api/dashboard';
 
 function formatCurrency(amount: number, currency?: string): string {
@@ -122,14 +122,15 @@ function AccountBalancesSection({ balances, isLoading, error }: {
   );
 }
 
-function MonthlySummarySection({ summaries, isLoading, error }: {
-  summaries: MonthlySummary[] | undefined;
+function MonthlySummarySection({ summaryData, isLoading, error }: {
+  summaryData: MonthlySummaryResponse | undefined;
   isLoading: boolean;
   error: Error | null;
 }) {
   const [selectedMonth, setSelectedMonth] = useState(getCurrentMonthStr());
 
-  const currentSummary = summaries?.find((s) => s.month === selectedMonth);
+  const currentSummary = summaryData?.months?.find((s) => s.month === selectedMonth);
+  const loanDifference = summaryData?.loanDifference ?? 0;
   const net = (currentSummary?.totalIncome ?? 0) - (currentSummary?.totalExpenses ?? 0);
 
   if (error) {
@@ -209,7 +210,7 @@ function MonthlySummarySection({ summaries, isLoading, error }: {
           <div style={{ ...styles.summaryCard, borderLeft: '4px solid #8b5cf6' }}>
             <span style={styles.summaryLabel}>Loan Difference</span>
             <span style={{ ...styles.summaryValue, color: '#8b5cf6' }}>
-              {currentSummary.loanDifference >= 0 ? '+' : ''}{formatCurrency(currentSummary.loanDifference)}
+              {loanDifference >= 0 ? '+' : ''}{formatCurrency(loanDifference)}
             </span>
           </div>
         </div>
@@ -268,7 +269,7 @@ export default function DashboardPage() {
       />
 
       <MonthlySummarySection
-        summaries={summaryQuery.data}
+        summaryData={summaryQuery.data}
         isLoading={summaryQuery.isLoading}
         error={summaryQuery.error}
       />
