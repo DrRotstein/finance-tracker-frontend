@@ -71,7 +71,7 @@ export default function LinkTransferPairModal({
       tx.id !== sourceTransaction.id &&
       (search === '' ||
         tx.description?.toLowerCase().includes(search.toLowerCase()) ||
-        tx.category.toLowerCase().includes(search.toLowerCase()) ||
+        tx.category?.name?.toLowerCase().includes(search.toLowerCase()) ||
         tx.fromAccount?.name?.toLowerCase().includes(search.toLowerCase()) ||
         tx.toAccount?.name?.toLowerCase().includes(search.toLowerCase()))
   );

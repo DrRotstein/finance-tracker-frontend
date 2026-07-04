@@ -111,7 +111,7 @@ export default function RelationDetailModal({ transaction, onClose }: RelationDe
             🔗 Linked Transactions
           </h2>
           <p style={{ margin: '0.5rem 0 0', fontSize: '0.8125rem', color: '#64748b' }}>
-            Relations for: {transaction.category} — {formatDate(transaction.date)}
+            Relations for: {transaction.category?.name || '—'} — {formatDate(transaction.date)}
           </p>
         </div>
 
@@ -215,7 +215,7 @@ export default function RelationDetailModal({ transaction, onClose }: RelationDe
                             <>
                               <span style={{ color: '#64748b' }}>{formatDate(memberTx.date)}</span>
                               {' — '}
-                              <span>{memberTx.category}</span>
+                              <span>{memberTx.category?.name || '—'}</span>
                               {memberTx.description && (
                                 <span style={{ color: '#94a3b8' }}> ({memberTx.description})</span>
                               )}

@@ -70,7 +70,7 @@ export default function GroupTransactionsModal({
     (tx) =>
       search === '' ||
       tx.description?.toLowerCase().includes(search.toLowerCase()) ||
-      tx.category.toLowerCase().includes(search.toLowerCase()) ||
+      tx.category?.name?.toLowerCase().includes(search.toLowerCase()) ||
       tx.fromAccount?.name?.toLowerCase().includes(search.toLowerCase()) ||
       tx.toAccount?.name?.toLowerCase().includes(search.toLowerCase())
   );
@@ -227,7 +227,7 @@ export default function GroupTransactionsModal({
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span>
-                        <strong>{formatDate(tx.date)}</strong> — {tx.category}
+                        <strong>{formatDate(tx.date)}</strong> — {tx.category?.name || '—'}
                       </span>
                       <span
                         style={{
