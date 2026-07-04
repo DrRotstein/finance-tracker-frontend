@@ -1,5 +1,6 @@
 import { type Account } from '../api/accounts';
-import { CATEGORY_PRESETS } from '../api/transactions';
+import { useQuery } from '@tanstack/react-query';
+import { fetchCategories } from '../api/categories';
 
 interface TransactionFiltersBarProps {
   type: string;
@@ -56,6 +57,11 @@ export default function TransactionFiltersBar({
   onDateToChange,
   onClearFilters,
 }: TransactionFiltersBarProps) {
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: fetchCategories,
+  });
+
   const hasFilters = type || accountId || category || dateFrom || dateTo;
 
   return (
@@ -111,9 +117,9 @@ export default function TransactionFiltersBar({
           aria-label="Filter by category"
         >
           <option value="">All categories</option>
-          {CATEGORY_PRESETS.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat.charAt(0).toUpperCase() + cat.slice(1)}
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.name}
             </option>
           ))}
         </select>

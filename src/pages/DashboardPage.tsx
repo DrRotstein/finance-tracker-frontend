@@ -171,7 +171,7 @@ function MonthlySummarySection({ summaries, isLoading, error }: {
 
       {isLoading ? (
         <div style={styles.summaryGrid}>
-          {[1, 2, 3, 4].map((i) => (
+          {[1, 2, 3, 4, 5].map((i) => (
             <div key={i} style={styles.summaryCard}>
               <div style={{ ...styles.skeletonLine, width: '60%', height: '0.75rem' }} />
               <div style={{ ...styles.skeletonLine, width: '80%', height: '1.25rem', marginTop: '0.5rem' }} />
@@ -204,6 +204,12 @@ function MonthlySummarySection({ summaries, isLoading, error }: {
             <span style={styles.summaryLabel}>Transfers</span>
             <span style={{ ...styles.summaryValue, color: '#2563eb' }}>
               {formatCurrency(currentSummary.totalTransfers)}
+            </span>
+          </div>
+          <div style={{ ...styles.summaryCard, borderLeft: '4px solid #8b5cf6' }}>
+            <span style={styles.summaryLabel}>Loan Difference</span>
+            <span style={{ ...styles.summaryValue, color: '#8b5cf6' }}>
+              {currentSummary.loanDifference >= 0 ? '+' : ''}{formatCurrency(currentSummary.loanDifference)}
             </span>
           </div>
         </div>

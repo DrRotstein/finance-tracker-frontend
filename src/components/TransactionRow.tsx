@@ -127,7 +127,7 @@ export default function TransactionRow({
             textOverflow: 'ellipsis',
           }}
         >
-          {transaction.category}
+          {transaction.category?.name || '—'}
         </div>
         <div
           style={{

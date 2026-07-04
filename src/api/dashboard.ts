@@ -14,6 +14,7 @@ export interface MonthlySummary {
   totalIncome: number;
   totalExpenses: number;
   totalTransfers: number;
+  loanDifference: number;
 }
 
 export async function fetchAccountBalances(): Promise<AccountBalance[]> {
